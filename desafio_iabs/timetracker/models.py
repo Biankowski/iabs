@@ -20,6 +20,9 @@ class Task(models.Model):
         verbose_name='Descrição'
     )
 
+    def __str__(self):
+        return self.description
+
 class TimeEntry(models.Model):
     task = models.ForeignKey(
         Task,
