@@ -41,3 +41,39 @@ def list_tasks(request):
     tasks = Task.objects.filter(user=request.user).select_related('user')
     
     return render(request, 'timetracker/task_list.html', {'tasks': tasks})
+
+@login_required
+def list_time_entries(request):
+    time_entries = TimeEntry.objects.filter(task__user=request.user).select_related('task', 'task__user')
+    
+    task_filter = request.GET.get('task')
+    date_from = request.GET.get('date_from')
+    date_to = request.GET.get('date_to')
+    description_filter = request.GET.get('description')
+    
+    if task_filter:
+        time_entries = time_entries.filter(task__id=task_filter)
+    
+    if date_from:
+        time_entries = time_entries.filter(entry_date__gte=date_from)
+    
+    if date_to:
+        time_entries = time_entries.filter(entry_date__lte=date_to)
+    
+    if description_filter:
+        time_entries = time_entries.filter(description__icontains=description_filter)
+    
+    user_tasks = Task.objects.filter(user=request.user)
+    
+    context = {
+        'time_entries': time_entries,
+        'user_tasks': user_tasks,
+        'filters': {
+            'task': task_filter,
+            'date_from': date_from,
+            'date_to': date_to,
+            'description': description_filter,
+        }
+    }
+    
+    return render(request, 'timetracker/time_entry_list.html', context)
