@@ -1,10 +1,10 @@
+from .models import Task, TimeEntry
+from .forms import TaskForm, TimeEntryForm
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
-from django.core.paginator import Paginator
-from .models import Task, TimeEntry
 
 def register(request):
     if request.method == 'POST':
@@ -77,3 +77,31 @@ def list_time_entries(request):
     }
     
     return render(request, 'timetracker/time_entry_list.html', context)
+
+@login_required
+def create_task(request):
+    if request.method == 'POST':
+        form = TaskForm(request.POST)
+        if form.is_valid():
+            task = form.save(commit=False)
+            task.user = request.user
+            task.save()
+            messages.success(request, 'Tarefa criada com sucesso!')
+            return redirect('list_tasks')
+    else:
+        form = TaskForm()
+    
+    return render(request, 'timetracker/create_task.html', {'form': form})
+
+@login_required
+def create_time_entry(request):
+    if request.method == 'POST':
+        form = TimeEntryForm(request.user, request.POST)
+        if form.is_valid():
+            time_entry = form.save()
+            messages.success(request, 'Registro de tempo criado com sucesso!')
+            return redirect('list_time_entries')
+    else:
+        form = TimeEntryForm(request.user)
+    
+    return render(request, 'timetracker/create_time_entry.html', {'form': form})
