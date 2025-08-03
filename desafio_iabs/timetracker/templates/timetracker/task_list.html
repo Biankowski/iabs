@@ -14,11 +14,16 @@
     {% if tasks %}
         <div class="list-group">
             {% for task in tasks %}
-                <div class="list-group-item">
-                    <h5>{{ task.description }}</h5>
+                <a href="{% url 'list_time_entries' %}?task={{ task.id }}" class="list-group-item list-group-item-action">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">{{ task.description }}</h5>
+                        <small class="text-muted">
+                            <i class="bi bi-clock"></i> Ver registros
+                        </small>
+                    </div>
                     <p class="mb-1"><strong>Usuário:</strong> {{ task.user.username }}</p>
-                    <small class="text-muted">Criada em {{ task.created_at }}</small>
-                </div>
+                    <small class="text-muted">Criada em {{ task.created_at|date:"d/m/Y H:i" }}</small>
+                </a>
             {% endfor %}
         </div>
     {% else %}
