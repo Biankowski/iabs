@@ -1,0 +1,88 @@
+{% extends "timetracker/base.html" %}
+
+{% block title %}Registros de Tempo{% endblock %}
+
+{% block content %}
+<div class="mt-5">
+    <h1 class="mb-4">Registros de Tempo</h1>
+    
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5>Filtros</h5>
+        </div>
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-3">
+                    <label for="task" class="form-label">Tarefa</label>
+                    <select name="task" id="task" class="form-select">
+                        <option value="">Todas as tarefas</option>
+                        {% for task in user_tasks %}
+                            <option value="{{ task.id }}" {% if filters.task == task.id|stringformat:"s" %}selected{% endif %}>
+                                {{ task.description|truncatechars:50 }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="date_from" class="form-label">Data Inicial</label>
+                    <input type="date" name="date_from" id="date_from" class="form-control" value="{{ filters.date_from|default:'' }}">
+                </div>
+                <div class="col-md-2">
+                    <label for="date_to" class="form-label">Data Final</label>
+                    <input type="date" name="date_to" id="date_to" class="form-control" value="{{ filters.date_to|default:'' }}">
+                </div>
+                <div class="col-md-3">
+                    <label for="description" class="form-label">Descrição</label>
+                    <input type="text" name="description" id="description" class="form-control" placeholder="Buscar na descrição..." value="{{ filters.description|default:'' }}">
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary me-2">Filtrar</button>
+                    <a href="{% url 'list_time_entries' %}" class="btn btn-outline-secondary">Limpar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% if time_entries %}
+        <div class="row">
+            <div class="col-12">
+                <p class="text-muted">{{ time_entries|length }} registro(s) encontrado(s)</p>
+            </div>
+        </div>
+        
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Tarefa</th>
+                        <th>Data</th>
+                        <th>Duração</th>
+                        <th>Descrição</th>
+                        <th>Criado em</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entry in time_entries %}
+                        <tr>
+                            <td>{{ entry.task.description|truncatechars:40 }}</td>
+                            <td>{{ entry.entry_date|date:"d/m/Y" }}</td>
+                            <td>{{ entry.duration }}</td>
+                            <td>{{ entry.description|default:"—"|truncatechars:50 }}</td>
+                            <td>{{ entry.created_at|date:"d/m/Y H:i" }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle"></i>
+            {% if filters.task or filters.date_from or filters.date_to or filters.description %}
+                Nenhum registro de tempo encontrado com os filtros aplicados.
+            {% else %}
+                Nenhum registro de tempo cadastrado ainda.
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
