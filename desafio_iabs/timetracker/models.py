@@ -23,6 +23,11 @@ class Task(models.Model):
     def __str__(self):
         return self.description
 
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Tarefa'
+        verbose_name_plural = 'Tarefas'
+
 class TimeEntry(models.Model):
     task = models.ForeignKey(
         Task,
@@ -48,4 +53,12 @@ class TimeEntry(models.Model):
         auto_now_add=True,
         verbose_name='Criado em'
     )
+
+    def __str__(self):
+        return f"{self.task.description} - {self.duration} em {self.entry_date}"
+
+    class Meta:
+        ordering = ['-entry_date', '-created_at']
+        verbose_name = 'Registro de Tempo'
+        verbose_name_plural = 'Registros de Tempo'
     
