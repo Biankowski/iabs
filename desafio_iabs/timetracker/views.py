@@ -102,6 +102,11 @@ def create_time_entry(request):
             messages.success(request, 'Registro de tempo criado com sucesso!')
             return redirect('list_time_entries')
     else:
-        form = TimeEntryForm(request.user)
+        initial_data = {}
+        task_id = request.GET.get('task')
+        if task_id and Task.objects.filter(id=task_id, user=request.user).exists():
+            initial_data['task'] = task_id
+        
+        form = TimeEntryForm(request.user, initial=initial_data)
     
     return render(request, 'timetracker/create_time_entry.html', {'form': form})

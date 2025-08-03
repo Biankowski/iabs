@@ -5,8 +5,22 @@
 {% block content %}
 <div class="mt-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>Registros de Tempo</h1>
-        <a href="{% url 'create_time_entry' %}" class="btn btn-primary">
+        <div>
+            <h1>Registros de Tempo</h1>
+            {% if filters.task %}
+                {% for task in user_tasks %}
+                    {% if task.id|stringformat:"s" == filters.task %}
+                        <p class="text-muted mb-0">
+                            <i class="bi bi-filter"></i> Mostrando registros para: <strong>{{ task.description|truncatechars:60 }}</strong>
+                            <a href="{% url 'list_time_entries' %}" class="btn btn-sm btn-outline-secondary ms-2">
+                                <i class="bi bi-x"></i> Remover filtro
+                            </a>
+                        </p>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        </div>
+        <a href="{% url 'create_time_entry' %}{% if filters.task %}?task={{ filters.task }}{% endif %}" class="btn btn-primary">
             <i class="bi bi-plus"></i> Novo Registro
         </a>
     </div>
