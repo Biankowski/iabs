@@ -1,7 +1,9 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
+from django.core.paginator import Paginator
 from .models import Task, TimeEntry
 
 def register(request):
@@ -34,7 +36,8 @@ def user_logout(request):
     messages.success(request, 'Logout realizado com sucesso!')
     return redirect('login')
 
+@login_required
 def list_tasks(request):
-    tasks = Task.objects.select_related('user').all()
+    tasks = Task.objects.filter(user=request.user).select_related('user')
     
     return render(request, 'timetracker/task_list.html', {'tasks': tasks})
